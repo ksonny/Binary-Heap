@@ -5,7 +5,7 @@ Implementation of binary heap for inclusion in other projects. Built with custom
 Example usage
 -------------
 
-´´´ C       
+``` C       
 int bheap_max_comparator(const bheap_data_t *a, const bheap_data_t *b) 
 {
 	if (*a > *b)
@@ -40,4 +40,4 @@ int main(int argv, char *argc[])
 
         return 0;
 }
-´´´
+```
