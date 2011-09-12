@@ -1,3 +1,5 @@
+#ifndef _CBINARYHEAP_H_
+#define _CBINARYHEAP_H_
 /*
  * Implementation of a binary heap in C.
  *
@@ -24,6 +26,7 @@ typedef int (*bheap_comparator_t)(const bheap_data_t *a, const bheap_data_t *b);
 
 /**
  * struct bheap - binary heap
+ *
  * @capacity: capacity of storage
  * @used: capacity in use
  * @cmpf: pointer to comparison function
@@ -63,7 +66,7 @@ void bheap_create(struct bheap *h,
 /*
  * bheap_add - add items to binary heap
  */
-int bheap_add(struct bheap *h, const bheap_data_t *d);
+int bheap_add(struct bheap *h, const bheap_data_t *s);
 
 /*
  * bheap_remove - remove highest priority item
@@ -79,3 +82,5 @@ int bheap_head(const struct bheap *h, bheap_data_t *d);
  * bheap_pop - read and remove highest priority item
  */
 int bheap_pop(struct bheap *h, bheap_data_t *d);
+
+#endif /* _CBINARYHEAP_H_ */
