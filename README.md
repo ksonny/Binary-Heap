@@ -1,11 +1,13 @@
 # C Binary Heap
 
-Implementation of binary heap for inclusion in other projects. Built with customization and simplicity in mind, using typedefs for storage type and function pointer for comparison function. Implementation includes functions for creating heaps, adding items and removing items from front of list. The heap can be created from any array of compatible type and will work in-place. The heap will not grow automatically when adding items to a full heap, instead the operations will fail with an error message.
+Implementation of binary heap for inclusion in other projects. Built with customization and simplicity in mind, using typedefs for storage type and pointer for comparison function. Implementation includes functions for creating heaps, adding items and removing items from front of list. The heap can be created from any array of compatible type and will reuses array as storage. The heap will not grow automatically when adding items to a full heap, instead the operations will fail with an error message.
 
 Example usage
 -------------
 
 ``` C       
+#include "cbinaryheap.h"
+
 int bheap_max_comparator(const bheap_data_t *a, const bheap_data_t *b) 
 {
 	if (*a > *b)
@@ -23,7 +25,7 @@ int main(int argv, char *argc[])
 	bheap_data_t a = 4, b;
 	int i;
 
-        bheap_create(&heap, &bheap_max_comparator, 5, 6, ds);
+	bheap_create(&heap, &bheap_max_comparator, 5, 6, ds);
 	bheap_add(&heap, &a);
 	bheap_head(&heap, &b);
 	if (a == b)
