@@ -20,7 +20,7 @@ typedef unsigned int bheap_data_t;
 
 typedef unsigned int bheap_capacity_t;
 
-typedef unsigned int bheap_index_t;
+typedef int bheap_index_t;
 
 typedef int (*bheap_comparator_t)(const bheap_data_t *a, const bheap_data_t *b);
 

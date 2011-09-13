@@ -111,11 +111,11 @@ int bheap_full(const struct bheap *h)
 void bheap_rebuild(struct bheap *h)
 {
 	bheap_index_t i, j;
-	for (i = h->used - 1; i > 0; i--) {
-		j = bheap_parent(i);
-		if (bheap_compare(h, i, j) > 0)
-			bheap_swap(h, i, j);
-	}	
+	for (i = h->used / 2; i >= 0; i--) {
+		bheap_heapifydown(h, i);
+		/* if (bheap_compare(h, i, j) > 0)
+		   bheap_swap(h, i, j); */
+	}
 }
 
 /**
