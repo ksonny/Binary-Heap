@@ -76,7 +76,7 @@ int bheap_remove(struct bheap *h);
 /*
  * bheap_head - read highest priority item
  */
-int bheap_head(const struct bheap *h, bheap_data_t *d);
+bheap_data_t *bheap_head(const struct bheap *h);
 
 /*
  * bheap_pop - read and remove highest priority item

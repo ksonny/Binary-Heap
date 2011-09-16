@@ -181,23 +181,25 @@ int bheap_remove(struct bheap *h)
  * bheap_head - read highest priority item
  *
  * @h: pointer to binary heap
- * @d: item destination
+ *
+ * Note: Item may change if heap is modified.
  */
-int bheap_head(const struct bheap *h, bheap_data_t *d)
+bheap_data_t *bheap_head(const struct bheap *h)
 {
 	if (bheap_empty(h))
-		return 0;
-	*d = h->ds[0];
-	return 1;
+		return (void *)0;
+	return h->ds;
 }
 
 /**
- * bheap_pop - read and remove highest priority item
+ * bheap_pop - copy and remove highest priority item
  *
  * @h: pointer to binary heap
  * @d: item destination
  */
 int bheap_pop(struct bheap *h, bheap_data_t *d)
 {
-	return (bheap_head(h, d) && bheap_remove(h));
+	if (bheap_head(h) != (void *)0)
+		*d = *bheap_head(h);
+	return bheap_remove(h);
 }
