@@ -1,7 +1,8 @@
 #ifndef _CBINARYHEAPMACRO_H_
 #define _CBINARYHEAPMACRO_H_
-/*
- */
+
+#include <stddef.h>
+
 typedef int bheap_capacity_t;
 
 typedef int bheap_index_t;
@@ -135,7 +136,7 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	type *bheap_##name##_head(struct bheap_##name *h)	\
 	{							\
 		if (bheap_##name##_empty(h))			\
-			return (void *)0;			\
+			return NULL;			\
 		return h->ds;					\
 	}
 
@@ -143,7 +144,7 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	int bheap_##name##_pop(struct bheap_##name *h, type *d)		\
 	{								\
 		const type *tmp = bheap_##name##_head(h);		\
-		if (tmp != (void *)0)					\
+		if (tmp != NULL)					\
 			*d = *tmp;					\
 		return bheap_##name##_remove(h);			\
 	}
