@@ -1,45 +1,41 @@
 # C Binary Heap
 
-Implementation of binary heap for inclusion in other projects. Built with customization and simplicity in mind, using typedefs for storage type and pointer for comparison function. Implementation includes functions for creating heaps, adding items and removing items from front of list. The heap can be created from any array of compatible type and will reuses array as storage. The heap will not grow automatically when adding items to a full heap, instead the operations will fail with an error message.
-
 Example usage
 -------------
 
-``` C       
-#include "cbinaryheap.h"
+``` C
+#include <stdio.h>
+#include "cbh_macro.h"
 
-int bheap_max_comparator(const bheap_data_t *a, const bheap_data_t *b) 
+int compare_test(const int *a, const int *b)
 {
-	if (*a > *b)
-		return 1;
-	else if (*a < *b)
-		return -1;
-	else
-		return 0;
+	return (*a > *b);
 }
+
+bheap_generate_definitions(test, int)
 
 int main(int argv, char *argc[])
 {
-	struct bheap heap;
-	bheap_data_t ds[6] = {2, 0, 1, 1, 3};
-	bheap_data_t a = 4, b;
-	int i;
+	struct bheap_test heap;
+	int ns[7] = {5, 3, 0, 1, 2, 4};
+	int a = 6;
+	int b;
 
-	bheap_create(&heap, &bheap_max_comparator, 5, 6, ds);
-	bheap_add(&heap, &a);
-	bheap_head(&heap, &b);
-	if (a == b)
-		printf("true\n");
+	bheap_test_create(&heap, 6, 7, ns);
+
+	bheap_test_add(&heap, &a);
+	if (a == *bheap_test_head(&heap))
+		printf("largest is first\n");
 	else
-		printf("false, %u, %u.\n", a, b);
+		printf("fuckup");
 
 	printf("Print sorted order:   ");
-	while (!bheap_empty(&heap)) {
-		bheap_pop(&heap, &b);
-		printf("%u ", b);
+	while (!bheap_test_empty(&heap)) {
+		printf("%u ", *bheap_test_head(&heap));
+		bheap_test_remove(&heap);
 	}
 	printf("\n");
 
-        return 0;
+	return 0;
 }
 ```
