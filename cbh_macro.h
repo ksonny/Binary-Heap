@@ -2,9 +2,9 @@
 #define _CBINARYHEAPMACRO_H_
 
 #include <stddef.h>
+#include <assert.h>
 
 typedef int bheap_capacity_t;
-
 typedef int bheap_index_t;
 
 /*
@@ -13,14 +13,17 @@ typedef int bheap_index_t;
  */
 static bheap_index_t bheap_parent(const bheap_index_t i)
 {
+	assert(i >= 0);
 	return (i - 1) / 2;
 }
 static bheap_index_t bheap_lchild(const bheap_index_t i)
 {
+	assert(i >= 0);
 	return i + i + 1;
 }
 static bheap_index_t bheap_rchild(const bheap_index_t i)
 {
+	assert(i >= 0);
 	return i + i + 2;
 }
 
@@ -32,13 +35,13 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	};
 
 #define bheap_empty_define(name)				\
-	int bheap_##name##_empty(struct bheap_##name *h)	\
+	int bheap_##name##_empty(const struct bheap_##name *h)	\
 	{							\
 		return !(h->used > 0);				\
 	}
 
 #define bheap_full_define(name)					\
-	int bheap_##name##_full(struct bheap_##name *h)		\
+	int bheap_##name##_full(const struct bheap_##name *h)	\
 	{							\
 		return !(h->used < h->capacity);		\
 	}
@@ -89,6 +92,8 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	void bheap_##name##_rebuild(struct bheap_##name *h)		\
 	{								\
 		bheap_index_t i;					\
+		if (bheap_##name##_empty(h))				\
+			return;						\
 		for (i = h->used / 2; i >= 0; i--)			\
 			bheap_##name##_heapifydown(h, i);		\
 	}
@@ -99,6 +104,9 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 				const bheap_capacity_t capacity,	\
 				type *ds)				\
 	{								\
+		assert(h != NULL);					\
+		assert(used <= capacity);				\
+		assert(ds != NULL);					\
 		h->used     = used;					\
 		h->capacity = capacity;					\
 		h->ds       = ds;					\
@@ -108,6 +116,7 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 #define bheap_add_define(name, type)					\
 	int bheap_##name##_add(struct bheap_##name *h, const type *s)	\
 	{								\
+		assert(s != NULL);					\
 		if (bheap_##name##_full(h))				\
 			return 0;					\
 		h->used++;						\
@@ -120,6 +129,7 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	int bheap_##name##_remove_at(struct bheap_##name *h,	\
 				const bheap_index_t i)		\
 	{							\
+		assert(i >= 0 && i < h->used);			\
 		if (bheap_##name##_empty(h))			\
 			return 0;				\
 		h->used--;					\
@@ -133,26 +143,27 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	}
 
 #define bheap_head_define(name, type)				\
-	type *bheap_##name##_head(struct bheap_##name *h)	\
+	type *bheap_##name##_head(const struct bheap_##name *h)	\
 	{							\
 		if (bheap_##name##_empty(h))			\
-			return NULL;			\
+			return NULL;				\
 		return h->ds;					\
 	}
 
 #define bheap_pop_define(name, type)					\
 	int bheap_##name##_pop(struct bheap_##name *h, type *d)		\
 	{								\
-		const type *tmp = bheap_##name##_head(h);		\
-		if (tmp != NULL)					\
-			*d = *tmp;					\
+		assert(d != NULL);					\
+		if (bheap_##name##_empty(h))				\
+			return 0;					\
+		*d = *bheap_##name##_head(h);				\
 		return bheap_##name##_remove(h);			\
 	}
 
 #define bheap_prototypes(name, type)					\
 	struct bheap_##name;						\
-	extern int bheap_##name##_empty(struct bheap_##name *h);	\
-	extern int bheap_##name##_full(struct bheap_##name *h);		\
+	extern int bheap_##name##_empty(const struct bheap_##name *h);	\
+	extern int bheap_##name##_full(const struct bheap_##name *h);	\
 	extern void bheap_##name##_rebuild(struct bheap_##name *h);	\
 	extern void bheap_##name##_create(struct bheap_##name *h,	\
 					const bheap_capacity_t used,	\
@@ -162,7 +173,7 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	extern int bheap_##name##_remove_at(struct bheap_##name *h,	\
 					const bheap_index_t i);		\
 	extern int bheap_##name##_remove(struct bheap_##name *h);	\
-	extern type *bheap_##name##_head(struct bheap_##name *h);	\
+	extern type *bheap_##name##_head(const struct bheap_##name *h);	\
 	extern int bheap_##name##_pop(struct bheap_##name *h, type *d);
 
 
