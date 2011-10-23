@@ -1,3 +1,29 @@
+/*
+ * Binary heap
+ *
+ * Macros for generating a layer of functionality that allows
+ * any array to be used as a priority queue.
+ *
+ * Features:
+ * - Any type can be used.
+ *
+ * - Any array can be converted into a binary heap.
+ *   Reduced overhead when data already loaded.
+ *
+ * - Preprocessor generates native code.
+ *   All code is type checked.
+ *   Fast.
+ *
+ * - All generated code is enclosed in functions.
+ *   Any error inside a macro references correct function.
+ *   (Useful as hell since macro's break line numbering.)
+ *
+ * - No memory allocated.
+ *   Simplify reasoning about code.
+ *   (But you have to make sure capacity is available!)
+ *
+ * - ANSI C
+ */
 #ifndef _CBINARYHEAPMACRO_H_
 #define _CBINARYHEAPMACRO_H_
 
@@ -7,10 +33,6 @@
 typedef int bheap_capacity_t;
 typedef int bheap_index_t;
 
-/*
- * Our implementation uses a list for representing a heap.
- * These three functions are used for traversing the heap.
- */
 static bheap_index_t bheap_parent(const bheap_index_t i)
 {
 	assert(i >= 0);
@@ -34,12 +56,20 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		type *ds;			\
 	};
 
+/**
+ * bheap_empty_define() - Generate empty test function
+ * @name: identifying name of heap type
+ */
 #define bheap_empty_define(name)				\
 	int bheap_##name##_empty(const struct bheap_##name *h)	\
 	{							\
 		return !(h->used > 0);				\
 	}
 
+/**
+ * bheap_full_define() - Generate full test function
+ * @name: identifying name of heap type
+ */
 #define bheap_full_define(name)					\
 	int bheap_##name##_full(const struct bheap_##name *h)	\
 	{							\
@@ -87,7 +117,18 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		}							\
 	}
 
-
+/**
+ * bheap_rebuild_define() - Generate rebuild function
+ * @name: identifying name of heap type
+ *
+ * Generate function that rebuilds heap structure,
+ * argument is a heap.
+ *
+ * Realizing that a heap is a collection of smaller heaps,
+ * we make sure all heaps individually satisfies heap
+ * property. This can be done in O(n), faster then inserting
+ * all elements in new heap O(n*log(n)).
+ */
 #define bheap_rebuild_define(name)					\
 	void bheap_##name##_rebuild(struct bheap_##name *h)		\
 	{								\
@@ -98,6 +139,17 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 			bheap_##name##_heapifydown(h, i);		\
 	}
 
+/**
+ * bheap_create_define() - Generate create function
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Generate function that initiate a new heap structure,
+ * arguments are a heap, capacity used, available capacity
+ * and a pointer to a array of elements.
+ *
+ * Both heap and element array must be exist!
+ */
 #define bheap_create_define(name, type)					\
 	void bheap_##name##_create(struct bheap_##name *h,		\
 				const bheap_capacity_t used,		\
@@ -113,6 +165,19 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		bheap_##name##_rebuild(h);				\
 	}
 
+/**
+ * bheap_add_define() - Generate add function
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Generate function that adds an element to heap,
+ * arguments are a heap and a pointer to element.
+ *
+ * Note that memory allocation is all up to the user.
+ * If add returns 0, you need to add more space by either
+ * realloc h->ds and increment h->capacity, or create
+ * a new heap and copy all data.
+ */
 #define bheap_add_define(name, type)					\
 	int bheap_##name##_add(struct bheap_##name *h, const type *s)	\
 	{								\
@@ -125,6 +190,19 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		return 1;						\
 	}
 
+/**
+ * bheap_remove_define() - Generate remove functions
+ * @name: identifying name of heap type
+ *
+ * Generate two remove functions, remove_at and remove.
+ * remove_at removes an element at any position in heap,
+ * arguments are a heap and an index.
+ * remove removes first element on heap,
+ * arguments is a heap.
+ *
+ * Heap is resorted by replacing removed element with last element and
+ * sorting downwards.
+ */
 #define bheap_remove_define(name)				\
 	int bheap_##name##_remove_at(struct bheap_##name *h,	\
 				const bheap_index_t i)		\
@@ -142,6 +220,14 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		return bheap_##name##_remove_at(h, 0);		\
 	}
 
+/**
+ * bheap_head_define() - Generate head function
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Generate function that returns pointer to first element,
+ * argument is a heap.
+ */
 #define bheap_head_define(name, type)				\
 	type *bheap_##name##_head(const struct bheap_##name *h)	\
 	{							\
@@ -150,6 +236,14 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		return h->ds;					\
 	}
 
+/**
+ * bheap_pop_define() - Generate pop function
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Generate function that extracts and remove first element from heap,
+ * arguments are a heap and an element to add.
+ */
 #define bheap_pop_define(name, type)					\
 	int bheap_##name##_pop(struct bheap_##name *h, type *d)		\
 	{								\
@@ -160,6 +254,15 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 		return bheap_##name##_remove(h);			\
 	}
 
+/**
+ * bheap_prototypes() - Allows using already defined heap
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Allows heap function definitions to be used in any file by
+ * generating the correct prototypes.
+ *
+ */
 #define bheap_prototypes(name, type)					\
 	struct bheap_##name;						\
 	extern int bheap_##name##_empty(const struct bheap_##name *h);	\
@@ -176,8 +279,17 @@ static bheap_index_t bheap_rchild(const bheap_index_t i)
 	extern type *bheap_##name##_head(const struct bheap_##name *h);	\
 	extern int bheap_##name##_pop(struct bheap_##name *h, type *d);
 
-
-#define bheap_generate_definitions(name, type)	\
+/**
+ * bheap_definitions() - Generate struct and functions
+ * @name: identifying name of heap type
+ * @type: type stored in heap
+ *
+ * Expects a compare function to exist in same scope,
+ * int compare_<name>(const type *a, const type *b).
+ * Compare returns 1 if a has higher priority then b else return 0.
+ * If compare is not defined, you will get an undefined symbols error.
+ */
+#define bheap_definitions(name, type)		\
 	bheap_struct_define(name, type)		\
 	bheap_swap_define(name, type)		\
 	bheap_empty_define(name)		\
