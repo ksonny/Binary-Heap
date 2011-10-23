@@ -1,4 +1,28 @@
-# C Binary Heap
+# Binary Heap
+
+Macros for generating a layer of functionality that allows
+arrays to be used as a priority queue.
+
+Features:
+
+- Any type can be used.                                                                                                                                         
+                                                                                                                                                                
+- Any array can be converted into a binary heap.                                                                                                                
+  Reduced overhead when data already loaded.                                                                                                                    
+                                                                                                                                                                
+- Preprocessor generates native code.                                                                                                                           
+  All code is type checked.                                                                                                                                     
+  Fast.                                                                                                                                                         
+                                                                                                                                                                
+- All generated code is enclosed in functions.                                                                                                                  
+  Any error inside a macro references correct function.                                                                                                         
+  (Very useful when macros break line numbering.)                                                                                                          
+                                                                                                                                                                
+- No memory allocated.                                                                                                                                          
+  Simplify reasoning about code.                                                                                                                                
+  (But you have to make sure capacity is available!)                                                                                                            
+                                                                                                                                                                
+- ANSI C
 
 Example usage
 -------------
